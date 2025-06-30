@@ -8,7 +8,7 @@ class Transaction(models.Model):
     category = models.ForeignKey('TransactionCategory', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.title
+        return self.description
 
 class TransactionCategory(models.Model):
 
