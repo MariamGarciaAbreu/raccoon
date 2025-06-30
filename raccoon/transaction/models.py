@@ -12,10 +12,10 @@ class Transaction(models.Model):
 
 class TransactionCategory(models.Model):
 
-    name = models.CharField(max_length=100)
+    label = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return self.label
 
     # @classmethod
     # def generate_data(cls, count=10):

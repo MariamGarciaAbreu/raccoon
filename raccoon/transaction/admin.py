@@ -6,8 +6,8 @@ class TransactionAdmin(admin.ModelAdmin):
     list_display = ('description', 'amount', 'date', 'category')
     search_fields = ('description', 'category__name')
     list_filter = ('date', 'category')
-    
+
 @admin.register(TransactionCategory)
 class TransactionCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+    list_display = ('label',)
+    search_fields = ('label',)
