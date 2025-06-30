@@ -26,7 +26,7 @@ transactions_with_categories = pd.merge(transactions, categories, on='Sub-catego
 
 # ---- SIDEBAR ----
 with st.sidebar:
-    st.title('💵 Personal Finances Dashboard')
+    st.title('Choose a date range')
     
     year_list = list(transactions.Year.unique())[::-1]
     
