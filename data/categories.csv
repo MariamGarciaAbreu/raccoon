@@ -1,0 +1,29 @@
+"Sub-category","Category","Category Type","Type"
+Accomodations,✈️Travelling,Expense,Want
+Food,✈️Travelling,Expense,Want
+Transportation,✈️Travelling,Expense,Want
+Clothes,❣️ Myself,Expense,Want
+Education,❣️ Myself,Expense,Want
+Other,❣️ Myself,Expense,Need
+Medicine,❣️ Myself,Expense,Need
+Doctor,❣️ Myself,Expense,Need
+Debts,❣️ Myself,Expense,Need
+Bank fees,❣️ Myself,Expense,Need
+Gas,🏠 Living Expenses,Expense,Need
+Groceries,🏠 Living Expenses,Expense,Need
+Internet,🏠 Living Expenses,Expense,Need
+Rent,🏠 Living Expenses,Expense,Need
+Electricity,🏠 Living Expenses,Expense,Need
+Phone internet,🏠 Living Expenses,Expense,Want
+Public transportation,🚙 Transport,Expense,Need
+Uber,🚙 Transport,Expense,Want
+Restaurants,🫂Social,Expense,Want
+Cultural events,🫂Social,Expense,Want
+Friends,🫂Social,Expense,Want
+Interest,✌🏽 Passive,Income,Variable
+Salary,⚒️ Active,Income,Fixed
+Savings,🦺 Savings,Savings,
+Fun,❣️ Myself,Expense,Want
+Cashback,✌🏽 Passive,Income,Variable
+Using savings,♻️Reuse,Not reported,
+Glasses,❣️ Myself,Expense,Need
