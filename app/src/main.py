@@ -1,29 +1,30 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
-# import plotly.express as px
-import numpy as np
-from utils import convert_month_num_to_name
-
+import utils
 
 st.set_page_config(
-    page_title="Finance Dashboard",
+    page_title="Personal Finances Dashboard",
     page_icon="🤑",
     layout="wide",
     initial_sidebar_state="expanded")
 
-alt.themes.enable("dark")
+@st.cache_data
+def get_data_from_csv():
+    return (pd.read_csv('../../data/transactions.csv'), pd.read_csv('../../data/categories.csv'))
 
-transactions = pd.read_csv('../../data/transactions.csv')
+transactions, categories = get_data_from_csv()
+
+# ---- DATA TREATMENT ----
 transactions["Debit"] = transactions["Debit"].fillna(0)
 transactions["Credit"] = transactions["Credit"].fillna(0)
 transactions["Actual"] = transactions["Credit"] - transactions["Debit"]
-transactions['Date'] = pd.to_datetime(transactions.Date)
-transactions['Date'] = transactions['Date'].dt.strftime('%d/%m/%Y')
+transactions['Date'] = pd.to_datetime(transactions.Date, format='%d/%m/%Y')
+transactions['Date'] = transactions['Date'].dt.strftime('%m/%d/%Y')
 transactions["Month"] = pd.to_datetime(transactions["Date"]).dt.month
 transactions["Year"] = pd.to_datetime(transactions["Date"]).dt.year
+transactions_with_categories = pd.merge(transactions, categories, on='Sub-category', how='left')
 
-
+# ---- SIDEBAR ----
 with st.sidebar:
     st.title('💵 Personal Finances Dashboard')
     
@@ -40,27 +41,34 @@ with st.sidebar:
         value=(month_list[0], month_list[-1])
 
     )   
-    st.write("You wanna wassup between", convert_month_num_to_name(start_month), "and", convert_month_num_to_name(end_month))
+    st.write("You wanna wassup between", utils.convert_month_num_to_name(start_month), "and", utils.convert_month_num_to_name(end_month))
 
+filtered_transactions = transactions_with_categories.query('Year == @selected_year and Month >= @start_month and Month <= @end_month')
 
+if filtered_transactions.empty:
+    st.warning("No data available based on the current filter settings!")
+    st.stop() 
 
-categories = pd.read_csv('../../data/categories.csv')
+# ---- MAIN PAGE ----
+def calculate_financial_freedom_values():
+    passive_income = filtered_transactions.loc[filtered_transactions['Category'] == '✌🏽 Passive', 'Actual'].sum()
+    needs = filtered_transactions.loc[filtered_transactions['Type'] == 'Need', 'Actual'].sum()
 
-transactions_with_steroids = pd.merge(transactions, categories, on='Sub-category', how='left')
-transactions_with_steroids = transactions_with_steroids.loc[transactions_with_steroids['Year'] == selected_year]
-transactions_with_steroids = transactions_with_steroids.loc[(transactions_with_steroids['Month'] >= start_month) & (transactions_with_steroids['Month'] <= end_month)]
-transactions_with_steroids["Income surplus/(deficit)"] = np.where(transactions_with_steroids['Category Type'] == 'Income', transactions_with_steroids['Actual'], 0)
-transactions_with_steroids["Expense surplus/(deficit)"] = np.where(transactions_with_steroids['Category Type'] == 'Expense', transactions_with_steroids['Actual'], 0)
+    if needs == 0:
+        return 0
+    
+    return passive_income - abs(needs), round((needs / passive_income)* 100, 2)
 
-grouped_transactions = transactions_with_steroids.groupby(["Category Type","Category"])[['Actual']].sum()  
+col1, col2, col3 = st.columns(3)
 
-st.write("### Monthly report")
-st.dataframe(grouped_transactions, height=250, use_container_width=True)
+with col1:
+    total_income = filtered_transactions.query('`Category Type` == "Income"')["Actual"].sum()
+    st.metric("Total Income", utils.format_currency(total_income))
+with col2:
+    total_expenses = filtered_transactions.query('`Category Type` == "Expense"')["Actual"].sum()
+    st.metric("Total Expenses", utils.format_currency(total_expenses))
+with col3:
+    financial_freedom_amount, financial_freedom_percentage = calculate_financial_freedom_values()
+    st.metric(label="Financial Freedom", value=utils.format_currency(financial_freedom_amount), delta=financial_freedom_percentage, delta_color="normal", help="Passive Income - Needs")
 
-def calculate_financial_freedom():
-    passive_income = transactions_with_steroids.loc[transactions_with_steroids['Category'] == '✌🏽 Passive', 'Actual'].sum()
-    needs = transactions_with_steroids.loc[transactions_with_steroids['Type'] == 'Need', 'Actual'].sum()
-
-    return passive_income - abs(needs)
-
-st.metric(label="Financial Freedom", value=calculate_financial_freedom(), delta=-1, delta_color="normal", help="Passive Income - Needs")
+st.markdown("""---""")
