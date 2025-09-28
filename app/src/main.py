@@ -8,9 +8,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded")
 
-@st.cache_data
 def get_data_from_csv():
-    return (pd.read_csv('../../data/transactions.csv'), pd.read_csv('../../data/categories.csv'))
+    transactions = pd.read_csv('data/transactions.csv')
+    categories = pd.read_csv('data/categories.csv')
+    return transactions, categories
 
 transactions, categories = get_data_from_csv()
 
