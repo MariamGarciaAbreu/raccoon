@@ -1,7 +1,7 @@
 ## Run the app
 
 ```Powershell
-streamlit run app/src/main.py
+streamlit run main.py
 
 # To quit simply hit Ctrl+c
 ```
