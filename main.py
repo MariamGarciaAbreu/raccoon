@@ -27,21 +27,7 @@ transactions["Month"] = pd.to_datetime(transactions["Date"]).dt.month
 transactions["Year"] = pd.to_datetime(transactions["Date"]).dt.year
 transactions_with_categories = pd.merge(transactions, categories, on='Sub-category', how='left')
 
-timeline = st.Page(
-    "views/timeline.py",
-    title="Timeline",
-    icon=":material/timeline:",
-    default=True,
-)
-summary = st.Page(
-    "views/summary.py",
-    title="Summary",
-    icon=":material/dashboard:",
-)
 
-pg = st.navigation(pages=[timeline, summary])
-
-st.sidebar.markdown("Made for the community with love by [Mariam](https://github.com/MariamGarciaAbreu/)")
 
 # ---- SIDEBAR ----
 with st.sidebar:
@@ -62,6 +48,8 @@ with st.sidebar:
     )   
     st.write("You wanna wassup between", utils.convert_month_num_to_name(start_month), "and", utils.convert_month_num_to_name(end_month))
 
+    st.sidebar.markdown("Made for the community with love by [Mariam](https://github.com/MariamGarciaAbreu/)")
+        
 filtered_transactions = transactions_with_categories.query('Year == @selected_year and Month >= @start_month and Month <= @end_month')
 
 if filtered_transactions.empty:
@@ -88,12 +76,17 @@ with col2:
     st.metric("Total Expenses", utils.format_currency(total_expenses))
 with col3:
     financial_freedom_amount, financial_freedom_percentage = calculate_financial_freedom_values()
-    st.metric(label="Financial Freedom", value=utils.format_currency(financial_freedom_amount), delta=financial_freedom_percentage, delta_color="normal", help="Passive Income - Needs")
+    st.metric(label="Financial Freedom", value=utils.format_currency(financial_freedom_amount), delta=f"{financial_freedom_percentage}% left to go", delta_color="normal", help="Passive Income - Needs")
 
 st.markdown("""---""")
 
+col1, col2 = st.columns(2)
 income = transactions_with_categories.loc[transactions_with_categories['Category Type'] == "Income"].groupby(["Category"])[['Actual']].sum().sort_values(by='Actual', ascending=False)
+expenses = transactions_with_categories.loc[transactions_with_categories['Category Type'] == "Expense"].groupby(["Category"])[['Actual']].sum().sort_values(by='Actual')
 
-# graph
-st.subheader("Income by Category")
-st.bar_chart(income, height=400)
+with col1:
+    st.subheader("Expenses by Category")
+    st.bar_chart(expenses, height=400)
+with col2:
+    st.subheader("Income by Category")
+    st.bar_chart(income, height=400)
