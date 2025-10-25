@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import utils.common as utils
-
+import plotly.graph_objects as go
 
 # ---- PAGE CONFIG ----
 st.set_page_config(
@@ -81,12 +81,26 @@ with col3:
 st.markdown("""---""")
 
 col1, col2 = st.columns(2)
-income = transactions_with_categories.loc[transactions_with_categories['Category Type'] == "Income"].groupby(["Category"])[['Actual']].sum().sort_values(by='Actual', ascending=False)
-expenses = transactions_with_categories.loc[transactions_with_categories['Category Type'] == "Expense"].groupby(["Category"])[['Actual']].sum().sort_values(by='Actual')
+income_by_category = filtered_transactions.loc[filtered_transactions['Category Type'] == "Income"].groupby(["Category"])[['Actual']].sum().sort_values(by='Actual', ascending=False)
+expenses = filtered_transactions.loc[filtered_transactions['Category Type'] == "Expense"].groupby(["Category"])[['Actual']].sum().sort_values(by='Actual')
 
 with col1:
     st.subheader("Expenses by Category")
     st.bar_chart(expenses, height=400)
 with col2:
     st.subheader("Income by Category")
-    st.bar_chart(income, height=400)
+    st.bar_chart(income_by_category, height=400)
+
+income_by_sub_category = filtered_transactions.loc[filtered_transactions['Category Type'] == "Income"].groupby(["Sub-category"])[['Actual']].sum().sort_values(by='Actual', ascending=False)
+
+# ---- PIECHART ----
+st.subheader("Income Distribution by Sub-Category")
+fig = go.Figure(
+    data=[go.Pie(labels=income_by_sub_category.index, values=income_by_sub_category['Actual'], hole=.4)])
+fig.update_traces(hoverinfo='label+percent', textinfo='value+label', textfont_size=20,
+                  )
+st.plotly_chart(fig, use_container_width=True)
+
+
+                
+                
